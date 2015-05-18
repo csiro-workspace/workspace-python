@@ -6,6 +6,6 @@ setup(name='csiro_workspace',
       author_email='workspace@csiro.au',
       url='http://research.csiro.au/workspace',
       packages=['csiro_workspace'],
-      package_data={'csiro_workspace', ['workspace.cfg']}
+      package_data={'csiro_workspace': ['workspace.cfg']}
 )
 
