@@ -16,8 +16,11 @@ The easiest way to install the package into your Python environment is
 to use [pip](https://pip.pypa.io):
 
 1. Download [pip](https://pip.pypa.io) if your Python environment does not have it already.
-2. Run the command:
-   ```pip install -e git+https://github.com/csiro-workspace/workspace-python.git```
+2. Run the command: 
+    ```
+    pip install -e git+https://github.com/csiro-workspace/workspace-python.git#egg=csiro_workspace
+    ```
+    This will install the package so that it is editable under csiro_workspace, which will allow you to modify the configuration, which is covered in the next section.
 
 ## Configuration
 The Workspace Python package comes with a JSON configuration file
