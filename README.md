@@ -49,8 +49,16 @@ The Workspace Python package comes with a JSON configuration file
 Depending on where Workspace is installed on the target system, and
 how you want it configured, you will need to edit this file.
 
+## Generating the API documentation
+For developers that wish to generate updated API documentation, this can
+be done by running the following command once the package is installed
+and correctly configured:
+```
+pdoc --html csiro_workspace
+```
+
 ## Usage
-Once installed, using the Workspace Python package is straightforward, though
+Using the Workspace Python package is straightforward, though
 it is useful to be aware that almost all of the functions on a Workspace
 instance are asynchronous. [Complete API documentation](https://research.csiro.au/static/workspace/workspace-python-docs/index.html) is available,
 and we provide a basic tutorial below.
