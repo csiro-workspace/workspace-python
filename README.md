@@ -23,7 +23,7 @@ to use [pip](https://pip.pypa.io):
 The Workspace Python package comes with a JSON configuration file
 `workspace.cfg` which can be found in your Python installation directory under
 `site-packages/csiro_workspace` and looks vaguely like this:
-```json
+```
 {
    // Directory that Workspace is installed to. This example uses the
    // default OSX installation directory.
