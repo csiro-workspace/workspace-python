@@ -52,7 +52,7 @@ how you want it configured, you will need to edit this file.
 ## Usage
 Once installed, using the Workspace Python package is straightforward, though
 it is useful to be aware that almost all of the functions on a Workspace
-instance are asynchronous. [Complete API documentation](https://github.com/csiro-workspace/workspace-python/api_documentation.html) is available,
+instance are asynchronous. [Complete API documentation](https://research.csiro.au/static/workspace/workspace-python-docs/index.html) is available,
 and we provide a basic tutorial below.
 
 ### Loading a Workspace workflow
