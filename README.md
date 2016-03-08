@@ -86,7 +86,7 @@ These functions are safe to call at any time; Workspace will queue
 requests and process them in the order that they're received, applying
 them to the workflow as soon as it is safe to do so.
 
-### Watching for output
+### Observing results
 Workflow results are observed by using callbacks, as this allows us to
 interact with our data at a time when the underlying Workspace process
 knows it is safe to do so.
