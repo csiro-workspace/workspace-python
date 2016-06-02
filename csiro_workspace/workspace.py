@@ -26,6 +26,7 @@ This copyright notice must be included with all copies of the source code.
 """
 
 from ctypes import cdll, byref, c_char, c_char_p, c_int, c_void_p, c_bool, Structure, pointer, POINTER, CFUNCTYPE
+import platform
 import copy
 import subprocess
 import atexit
@@ -62,7 +63,12 @@ WATCHFUNC     = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
 LISTFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
 
 # Our C++ function references
-LibWorkspaceWeb                       = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.dylib')
+if platform.system() == 'Windows':
+    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/bin/workspaceweb.dll')
+elif platform.system() == 'Mac':
+    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.dylib')
+elif platform.system() == 'Linux':
+    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.so')
 server_init                           = LibWorkspaceWeb.server_init
 server_listen_for_connection_and_wait = LibWorkspaceWeb.server_listen_for_connection_and_wait
 server_start_event_loop               = LibWorkspaceWeb.server_start_event_loop
