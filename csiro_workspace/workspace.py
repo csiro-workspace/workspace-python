@@ -63,12 +63,13 @@ WATCHFUNC     = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
 LISTFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
 
 # Our C++ function references
+LibWorkspaceWeb = None
 if platform.system() == 'Windows':
     LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/bin/workspaceweb.dll')
-elif platform.system() == 'Mac':
-    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.dylib')
 elif platform.system() == 'Linux':
     LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.so')
+else:
+    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.dylib')
 server_init                           = LibWorkspaceWeb.server_init
 server_listen_for_connection_and_wait = LibWorkspaceWeb.server_listen_for_connection_and_wait
 server_start_event_loop               = LibWorkspaceWeb.server_start_event_loop
