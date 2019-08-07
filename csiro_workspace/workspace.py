@@ -365,7 +365,7 @@ class Workspace:
     # Variables used for ensuring that processes are terminated, even if
     # something goes wrong during the terminate communication process (e.g.
     # child process is frozen)
-    _SERVER_ADDRESS = '127.0.0.1'
+    _SERVER_ADDRESS = b'127.0.0.1'
     _terminating_processes = []
     _registered_workspaces = {}
     _event_loop_running    = False
@@ -678,7 +678,7 @@ class Workspace:
 
         __*Note:* This method is asynchronous__
         """
-        return workspace_set_input(byref(self._id), inputName, str(content))
+        return workspace_set_input(byref(self._id), bytes(inputName, "ascii"), bytes(str(content), "ascii"))
 
     def setGlobalName(self, globalName, content):
         """
@@ -694,7 +694,7 @@ class Workspace:
 
         __*Note:* This method is asynchronous__
         """
-        return workspace_set_global_name(byref(self._id), globalName, str(content))
+        return workspace_set_global_name(byref(self._id), bytes(globalName, "ascii"), bytes(str(content), "ascii"))
 
     def watch(self, callback, watchList, autoDelete=True):
         """
@@ -708,7 +708,7 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._watches[watchList.id] = _WatchCallback(self, watchList.id, callback, autoDelete)
-        if workspace_watch(byref(self._id), str(watchList), self._watchCallback, autoDelete):
+        if workspace_watch(byref(self._id), bytes(str(watchList), "ascii"), self._watchCallback, autoDelete):
             return watchList.id
         return None
 
@@ -718,7 +718,7 @@ class Workspace:
         existing callback associated with the `watchId`.
         """
         self._removeWatch(watchId)
-        workspace_cancel_watch(byref(self._id), watchId)
+        workspace_cancel_watch(byref(self._id), bytes(str(watchId), "ascii"))
 
     def listInputs(self, callback):
         """
