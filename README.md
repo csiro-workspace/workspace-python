@@ -8,7 +8,7 @@ running processes.
 ## Dependencies
 In order to use the Workspace Python package, you'll require:
 
-* Python 2.7
+* Python 3+
 * An install of Workspace version 3.3.2 or greater.
 
 ## Installation
