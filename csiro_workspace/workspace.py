@@ -65,7 +65,7 @@ LISTFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
 # Our C++ function references
 LibWorkspaceWeb = None
 if platform.system() == 'Windows':
-    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/bin/workspaceweb.dll')
+    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/workspaceweb.dll')
 elif platform.system() == 'Linux':
     LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.so')
 else:

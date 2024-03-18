@@ -69,7 +69,7 @@ Creating a handle to a running Workspace workflow is straightforward:
 import csiro_workspace.workspace as workspace
 
 def onConnected(ws):
-    // Once this callback is invoked, it will be safe to interact with the workflow.
+    # Once this callback is invoked, it will be safe to interact with the workflow.
     print('Connected to workspace %d' % ws.id)
     return True   # Callbacks must return a value.
 
@@ -129,8 +129,8 @@ are also provided to the callback function (with each items updated results) whe
 the specified items are updated. Here's an example:
 ```python
 def watchCallback(ws, watchList):
-    // Invoked as soon as all the inputs, outputs and globalNames named
-    // in the WatchList are brought up-to-date by Workspace.
+    # Invoked as soon as all the inputs, outputs and globalNames named
+    # in the WatchList are brought up-to-date by Workspace.
     print('WatchList contains: %s' % (watchList))
     return True   # Callbacks must return a value.
 

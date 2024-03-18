@@ -1,49 +1,82 @@
-<!DOCTYPE serializeddata>
-<operation type="Workspace" id="{d98cb369-671b-4836-baf4-9107c5c3421b}" atomic="false" label="Root" bgcolor="4280839393" plugin="www.csiro.au/workspace/builtin">
- <environment>
-  <platform>cocoa 64bit</platform>
-  <lastModified>2015-05-15T11:02:59</lastModified>
-  <plugin name="www.csiro.au/workspace/builtin" uri="www.csiro.au/workspace/packages/3.3.2/OSX/x86_64"/>
- </environment>
- <input name="Dependencies" size="0"/>
- <input name="Value1">0</input>
- <input name="Value2">0</input>
- <operation type="RunQtScript" namedoutputs="resultValue" id="{d98cb369-671b-4836-baf4-9107c5c3421b}" label="Multiply" bgcolor="4284395451" namedinputs="value1:value2" plugin="www.csiro.au/workspace/builtin">
+<?xml version="1.0" encoding="UTF-8"?>
+<operation atomic="false" bgcolor="4280839393" id="{d98cb369-671b-4836-baf4-9107c5c3421b}" label="Root" plugin="www.csiro.au/workspace/builtin" type="Workspace">
+  <environment>
+    <platform>windows 64bit</platform>
+    <lastModified>2024-03-18T12:38:59</lastModified>
+    <plugin name="www.csiro.au/workspace/builtin" uri="www.csiro.au/workspace/packages/6.21.4/Windows/x86_64"/>
+    <plugin name="www.csiro.au/workspace/python" uri="www.csiro.au/workspace/packages/6.21.4/Windows/x86_64"/>
+  </environment>
   <input name="Dependencies" size="0"/>
-  <input name="Script">resultValue = value1 * value2;</input>
-  <input name="Parameters" size="0"/>
-  <view y="-36.5" height="88" width="164" x="-242"/>
- </operation>
- <operation type="WorkspaceInput" id="{00deeed9-3f71-46ff-84a9-80409535feaf}" datatype="int" dataplugin="www.csiro.au/workspace/builtin" label="Value1" bgcolor="4278242304" plugin="www.csiro.au/workspace/builtin" dataname="Value1">
-  <input name="Dependencies" size="0"/>
-  <view y="-130" height="75" width="164" x="-472"/>
- </operation>
- <operation type="WorkspaceInput" id="{062c5997-2a00-4cbe-9016-861016809def}" datatype="int" dataplugin="www.csiro.au/workspace/builtin" label="Value2" bgcolor="4278242304" plugin="www.csiro.au/workspace/builtin" dataname="Value2">
-  <input name="Dependencies" size="0"/>
-  <view y="70" height="75" width="164" x="-462"/>
- </operation>
- <operation type="WorkspaceOutput" id="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}" datatype="int" dataplugin="www.csiro.au/workspace/builtin" label="Result" bgcolor="4294931456" plugin="www.csiro.au/workspace/builtin" dataname="Result">
-  <input name="Dependencies" size="1"/>
-  <view y="-40" height="95" width="164" x="288"/>
- </operation>
- <operation type="StringsConcatenator" id="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}" label="String concatenator" bgcolor="4284395451" plugin="www.csiro.au/workspace/builtin">
-  <input name="Dependencies" size="0"/>
-  <input name="Strings" size="3">
-   <input index="0">Result:&amp;#160;</input>
-   <input index="2" globalname="StringIn" preferredwidget="QLineEdit"></input>
-  </input>
-  <input name="Accumulate across iterations">0</input>
-  <output name="Concatenated String" globalname="StringOut" preferredwidget="QLineEdit"/>
-  <view y="-66.5" height="148" width="164" x="-62"/>
- </operation>
- <operation type="LogText" id="{0863c7e1-e3ea-4c30-8210-669b212a04ed}" label="Log Text" bgcolor="4284395451" plugin="www.csiro.au/workspace/builtin">
-  <input name="Dependencies" size="0"/>
-  <view y="-30" height="75" width="164" x="108"/>
- </operation>
- <connection dest_name="value1" from_op="{00deeed9-3f71-46ff-84a9-80409535feaf}" to_op="{d98cb369-671b-4836-baf4-9107c5c3421b}" src_name="Value1" copy="false"/>
- <connection dest_name="value2" from_op="{062c5997-2a00-4cbe-9016-861016809def}" to_op="{d98cb369-671b-4836-baf4-9107c5c3421b}" src_name="Value2" copy="false"/>
- <connection dest_name="Strings" from_op="{d98cb369-671b-4836-baf4-9107c5c3421b}" to_op="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}" dest_index="1" src_name="resultValue" copy="false"/>
- <connection dest_name="Result" from_op="{d98cb369-671b-4836-baf4-9107c5c3421b}" to_op="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}" src_name="resultValue" copy="false"/>
- <connection dest_name="Text to Log" from_op="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}" to_op="{0863c7e1-e3ea-4c30-8210-669b212a04ed}" src_name="Concatenated String" copy="false"/>
- <connection dest_name="Dependencies" from_op="{0863c7e1-e3ea-4c30-8210-669b212a04ed}" to_op="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}" dest_index="0" src_name="Dependencies" copy="false"/>
+  <input name="Value1">0</input>
+  <input name="Value2">0</input>
+  <anchors>
+    <anchor angle="-1" id="{b99d841c-2059-4c7f-bbbf-3cbe5cef9ace}" x="91" y="-180"/>
+  </anchors>
+  <operation bgcolor="4278242304" dataname="Value1" dataplugin="www.csiro.au/workspace/builtin" datatype="int" id="{00deeed9-3f71-46ff-84a9-80409535feaf}" label="Value1" plugin="www.csiro.au/workspace/builtin" type="WorkspaceInput">
+    <input name="Dependencies" size="0"/>
+    <view height="91" width="164" x="-492.75" y="-254.05"/>
+    <pos x="-470" y="-170"/>
+  </operation>
+  <operation bgcolor="4278242304" dataname="Value2" dataplugin="www.csiro.au/workspace/builtin" datatype="int" id="{062c5997-2a00-4cbe-9016-861016809def}" label="Value2" plugin="www.csiro.au/workspace/builtin" type="WorkspaceInput">
+    <input name="Dependencies" size="0"/>
+    <view height="91" width="164" x="-482.75" y="-54.05"/>
+    <pos x="-460" y="30"/>
+  </operation>
+  <operation bgcolor="4284395451" id="{0863c7e1-e3ea-4c30-8210-669b212a04ed}" label="Log Text" plugin="www.csiro.au/workspace/builtin" type="LogText">
+    <input name="Dependencies" size="0"/>
+    <input name="Text to Log"/>
+    <input name="Strings" size="2">
+      <input index="0">Hello from Workspace in Python</input>
+    </input>
+    <input name="Category"/>
+    <view height="155" width="164" x="69.75" y="-186.25"/>
+    <pos x="120" y="-70"/>
+  </operation>
+  <operation bgcolor="4284395451" id="{50a52cd1-3ac6-4485-8b5c-330f8a9d82a6}" label="Run python script" plugin="www.csiro.au/workspace/python" type="RunPythonScript">
+    <input name="Dependencies" size="1"/>
+    <input name="Script file"/>
+    <input name="Script">print(&quot;Hello from Python in Workspace in Python&quot;)</input>
+    <input name="Persistent namespace">0</input>
+    <input name="Run in GUI thread">0</input>
+    <input name="Module paths"/>
+    <view height="155" x="259.75" y="-186.25"/>
+    <pos x="310" y="-70"/>
+    <namedinputs/>
+    <namedoutputs/>
+  </operation>
+  <operation bgcolor="4284395451" id="{b79eecca-b354-4fdf-bd4c-41decb3e6865}" label="Multiply" namedinputs="value1:value2" namedoutputs="resultValue" plugin="www.csiro.au/workspace/builtin" type="RunQtScript">
+    <input name="Dependencies" size="0"/>
+    <input name="Script">resultValue = value1 * value2;</input>
+    <input name="Parameters" size="0"/>
+    <view height="155" width="164" x="-290.25" y="-186.25"/>
+    <pos x="-240" y="-70"/>
+  </operation>
+  <operation bgcolor="4284395451" id="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}" label="String concatenator" plugin="www.csiro.au/workspace/builtin" type="ConcatenateStrings">
+    <input name="Dependencies" size="0"/>
+    <input name="Strings" size="3">
+      <input index="0">Result:&amp;#160;</input>
+      <input globalname="StringIn" index="2" preferredwidget="QLineEdit"/>
+    </input>
+    <input name="Accumulate across iterations">0</input>
+    <input name="Reset accumulation" nodata="true"/>
+    <output globalname="StringOut" name="Concatenated String" preferredwidget="QLineEdit"/>
+    <view height="155" width="164" x="-110.25" y="-186.25"/>
+    <pos x="-60" y="-70"/>
+  </operation>
+  <operation bgcolor="4294931456" dataname="Result" dataplugin="www.csiro.au/workspace/builtin" datatype="int" id="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}" label="Result" plugin="www.csiro.au/workspace/builtin" type="WorkspaceOutput">
+    <input name="Dependencies" size="1"/>
+    <view height="91" width="164" x="467.25" y="-154.05"/>
+    <pos x="490" y="-70"/>
+  </operation>
+  <connection copy="false" dest_name="value1" from_op="{00deeed9-3f71-46ff-84a9-80409535feaf}" src_name="Value1" to_op="{b79eecca-b354-4fdf-bd4c-41decb3e6865}"/>
+  <connection copy="false" dest_name="value2" from_op="{062c5997-2a00-4cbe-9016-861016809def}" src_name="Value2" to_op="{b79eecca-b354-4fdf-bd4c-41decb3e6865}"/>
+  <connection copy="false" dest_index="0" dest_name="Dependencies" from_op="{0863c7e1-e3ea-4c30-8210-669b212a04ed}" src_name="Dependencies" to_op="{50a52cd1-3ac6-4485-8b5c-330f8a9d82a6}"/>
+  <connection copy="false" dest_index="0" dest_name="Dependencies" from_op="{50a52cd1-3ac6-4485-8b5c-330f8a9d82a6}" src_name="Dependencies" to_op="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}"/>
+  <connection copy="false" dest_name="Result" from_op="{b79eecca-b354-4fdf-bd4c-41decb3e6865}" src_name="resultValue" to_op="{4ef31ac5-79b5-4f39-ae34-b8de4776c073}">
+    <anchors>
+      <anchor id="{b99d841c-2059-4c7f-bbbf-3cbe5cef9ace}"/>
+    </anchors>
+  </connection>
+  <connection copy="false" dest_index="1" dest_name="Strings" from_op="{b79eecca-b354-4fdf-bd4c-41decb3e6865}" src_name="resultValue" to_op="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}"/>
+  <connection copy="false" dest_index="1" dest_name="Strings" from_op="{b800ac3e-e690-4ef9-bb20-ef8874e388ad}" src_name="Concatenated String" to_op="{0863c7e1-e3ea-4c30-8210-669b212a04ed}"/>
 </operation>
