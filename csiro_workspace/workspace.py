@@ -34,6 +34,7 @@ import uuid
 import json
 import datetime
 import os.path
+import ctypes
 
 class _WORKSPACE_ID(Structure):
     """
