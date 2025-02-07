@@ -572,6 +572,11 @@ class Workspace:
         self._watches = dict()
         self._listRequests = dict()
 
+        # Create these so that calling code can rely on the attributes existing
+        self._onFailedFunc = None
+        self._onSuccessFunc = None
+        self._onErrorFunc = None
+
         # Use our factory methods to create all our callback functions. These
         # callback functions are used to forward on to the functions that the
         # user registers.
@@ -627,6 +632,26 @@ class Workspace:
         re-execute it as required.
         """
         workspace_run_once(byref(self._id))
+
+    def runOnceAndWait(self):
+        """
+        Requests that the Workspace instance be executed once only. Will wait 
+        until this call succeeds or fails. Note that if the workflow fails to 
+        terminate, this function can run indefinitely.
+        """
+        complete = False
+        def wrapperFunc(func, ws):
+            nonlocal complete # Python makes you do closures this way
+            if not func is None:
+                func(ws)
+            complete = True
+
+        # Track the status of the workflow through the success / failure funcs.
+        self._onSuccessFunc = wrapperFunc(self._onSuccessFunc, self)
+        self._onFailedFunc = wrapperFunc(self._onFailedFunc, self)
+        self.runOnce()
+        while not complete:
+            self.poll()
 
     def runContinuously(self):
         """

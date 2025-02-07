@@ -74,6 +74,15 @@ class TestWorkspace(unittest.TestCase):
             self.ws.poll()
         self.assertTrue(self.called)
 
+    def test_successRunOnce(self):
+        self.called = False
+        def successCallback(workspace):
+            self.called = True
+            return True
+        self.ws.onSuccess(successCallback)
+        self.ws.runOnceAndWait()
+        self.assertTrue(self.called)
+
     def test_error(self):
         self.called = False
         def errorCallback(workspace, message):
