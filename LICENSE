@@ -1,7 +1,7 @@
 ﻿CSIRO Open Source Software License Agreement 
 (variation of the BSD / MIT License)
 
-Copyright (c) 2015, Commonwealth Scientific and Industrial Research 
+Copyright (c) 2025, Commonwealth Scientific and Industrial Research 
 Organisation (CSIRO) ABN 41 687 119 230.
 
 All rights reserved. CSIRO is willing to grant you a license to this Workspace 
@@ -29,21 +29,3 @@ APPLICABLE LEGISLATION SUCH AS THE AUSTRALIAN CONSUMER LAW MAY APPLY REPRESENTAT
 IN THIS CLAUSE, CSIRO INCLUDES ANY THIRD PARTY AUTHOR OR OWNER OF ANY PART OF THE SOFTWARE OR MATERIAL DISTRIBUTED WITH IT.  CSIRO MAY ENFORCE ANY RIGHTS ON BEHALF OF THE RELEVANT THIRD PARTY.
 
 As a condition of this license, you agree that where you make any adaptations, modifications, further developments, or additional features available to CSIRO or the public in connection with your access to the Software, you do so on the terms of the BSD 3-Clause License template, a copy available at: http://opensource.org/licenses/BSD-3-Clause.
-
-Third Party Components
--------------------------------------------------------------------------------
-The following third party components are distributed with the Software.  
-You agree to comply with the license terms for these components as part of 
-accessing the Software.  Other third party software may also be identified in 
-separate files distributed with the Software.
--------------------------------------------------------------------------------
-
-SMOOTH SIGNED DISTANCE SURFACE RECONSTRUCTION SOFTWARE (VERSION 3.0)
-Copyright (c) 2011, Fatih Calakli and Gabriel Taubin
-See <source dir>/ssd/license.txt for full details
-
-This project is designed to be built against a number of existing open source libraries but developers should acquire the source for these projects themselves.
-
-http://pointclouds.org/
-https://github.com/libLAS/libLAS
-https://github.com/LASzip/LASzip
