@@ -131,6 +131,68 @@ class TestWorkspace(unittest.TestCase):
         self.assertEqual('oh_hello', self.resultsList.globalNames['StringIn']['value'])
         self.assertEqual('', self.resultsList.globalNames['StringOut']['value'])
 
+    def test_getOutputs_Success(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 6)
+        self.ws.runOnceAndWait()
+        outputs = self.ws.getOutputs()
+        self.assertEqual(outputs['Result']['value'], 12)
+
+    def test_getOutputs_Fail(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 'b')
+        self.ws.runOnceAndWait()
+        outputs = self.ws.getOutputs()
+        self.assertEqual(outputs['Result']['value'], 0)
+
+    def test_getOutputs_NotRunning(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 6)
+        outputs = self.ws.getOutputs()
+        self.assertEqual(outputs['Result']['value'], 0)
+
+    def test_getInputs_Success(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 6)
+        self.ws.runOnceAndWait()
+        inputs = self.ws.getInputs()
+        self.assertEqual(inputs['Value1']['value'], 2)
+        self.assertEqual(inputs['Value2']['value'], 6)
+
+    def test_getInputs_Fail(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 'b')
+        self.ws.runOnceAndWait()
+        inputs = self.ws.getInputs()
+        self.assertEqual(inputs['Value1']['value'], 2)
+        self.assertEqual(inputs['Value2']['value'], 0)
+
+    def test_getInputs_NotRunning(self):
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 6)
+        inputs = self.ws.getInputs()
+        self.assertEqual(inputs['Value1']['value'], 2)
+        self.assertEqual(inputs['Value2']['value'], 6)
+
+    def test_getGlobalNames(self):
+        self.ws.setGlobalName('StringIn', 'oh_hello')
+        value1 = 2
+        value2 = 4
+        self.ws.setInput('Value1', value1)
+        self.ws.setInput('Value2', value2)
+        self.ws.runOnceAndWait()
+        globalNames = self.ws.getGlobalNames()
+        self.assertEqual(len(globalNames.keys()), 2)
+        self.assertEqual(len(globalNames['StringIn'].keys()), 2)
+        self.assertEqual(len(globalNames['StringOut'].keys()), 2)
+        expString = 'oh_hello'
+        self.assertEqual('QString', globalNames['StringIn']['type'])
+        self.assertEqual('QString', globalNames['StringOut']['type'])
+        self.assertEqual(expString, globalNames['StringIn']['value'])
+
+        expNumber = value1 * value2
+        self.assertEqual(f"Result: {expNumber}{expString}", globalNames['StringOut']['value'])
+
     def test_eventLoop(self):
         self.started = False
         self.expectedResults = [1, 1, 2, 3, 4, 5]

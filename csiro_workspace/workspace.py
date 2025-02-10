@@ -154,7 +154,7 @@ class IONotExistsError(Exception):
         Returns the name of the input, output or global name that does not
         exist.
         """
-        return _name
+        return self._name
 
 
 class WatchList(object):
@@ -633,25 +633,36 @@ class Workspace:
         """
         workspace_run_once(byref(self._id))
 
-    def runOnceAndWait(self):
+    def runOnceAndWait(self, timeoutMs=30000):
         """
         Requests that the Workspace instance be executed once only. Will wait 
         until this call succeeds or fails. Note that if the workflow fails to 
         terminate, this function can run indefinitely.
         """
-        complete = False
-        def wrapperFunc(func, ws):
-            nonlocal complete # Python makes you do closures this way
-            if not func is None:
-                func(ws)
-            complete = True
+        class WrapperFunc:
+            def __init__(self, func):
+                self.complete = False 
+                self.func = func
+
+            def __call__(self, ws):
+                result = False
+                if not self.func is None:
+                    result = self.func(ws)
+
+                # No mutex is required here as bool assignments are atomic
+                # and only one of these can be invoked at any time.
+                self.complete = True
+                return result
 
         # Track the status of the workflow through the success / failure funcs.
-        self._onSuccessFunc = wrapperFunc(self._onSuccessFunc, self)
-        self._onFailedFunc = wrapperFunc(self._onFailedFunc, self)
+        self._onSuccessFunc = WrapperFunc(self._onSuccessFunc)
+        self._onFailedFunc = WrapperFunc(self._onFailedFunc)
         self.runOnce()
-        while not complete:
+        while (not self._onSuccessFunc.complete and not self._onFailedFunc.complete):
             self.poll()
+
+        # Return
+        return self._onSuccessFunc.complete
 
     def runContinuously(self):
         """
@@ -775,6 +786,58 @@ class Workspace:
         """
         self._listRequests['globalNames'] = callback
         return workspace_list_global_names(byref(self._id), self._listCallbackGlobalNames)
+
+    def getOutputs(self):
+        """
+        Returns all Workspace outputs. 
+        If the workflow is not running, will return immediately with the values already assigned.
+        If the workflow is running, it will blocks until the data is ready.
+        """
+        outputData = None
+        def listCallback(ws, outputs):
+            nonlocal outputData
+            outputData = outputs
+            return True
+
+        self.listOutputs(listCallback)
+        while outputData is None:
+            self.poll()
+        return outputData.outputs
+
+    def getInputs(self):
+        """
+        Returns all Workspace inputs. 
+        If the workflow is not running, will return immediately with the values already assigned.
+        If the workflow is running, it will blocks until the data is ready.
+        """
+        inputData = None
+        def listCallback(ws, inputs):
+            nonlocal inputData
+            inputData = inputs
+            return True
+
+        self.listInputs(listCallback)
+        while inputData is None:
+            self.poll()
+        return inputData.inputs
+
+
+    def getGlobalNames(self):
+        """
+        Returns all Workspace inputs/outputs with global names attached. 
+        If the workflow is not running, will return immediately with the values already assigned.
+        If the workflow is running, it will blocks until the data is ready.
+        """
+        gnData = None
+        def gnCallback(ws, globalNames):
+            nonlocal gnData
+            gnData = globalNames 
+            return True
+
+        self.listGlobalNames(gnCallback)
+        while gnData is None:
+            self.poll()
+        return gnData.globalNames
 
     def onSuccess(self, callback):
         """
