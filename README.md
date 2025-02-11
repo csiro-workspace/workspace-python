@@ -25,6 +25,19 @@ to use [pip](https://pip.pypa.io):
     ```
     This will install the package so that it is editable under csiro_workspace, which will allow you to modify the configuration, which is covered in the next section.
 
+## Building
+Developers can build the project using:
+```
+python3 -m build
+```
+This relies on the build package being installed via pip, of course.
+
+## Testing
+Tests can be run using unittest:
+```
+python3 -m unittest tests/test_workspace.py
+```
+
 ## Configuration
 The Workspace Python package comes with a JSON configuration file
 `workspace.cfg` which can be found in your Python installation directory under
