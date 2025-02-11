@@ -1,4 +1,3 @@
-# Workspace Python Package
 The Workspace Python Package is a lightweight Python module that allows Workspace
 workflows to be executed from within Python code. Each Workspace workflow runs
 as an independent child process; an instance of the workspace-web executable.
@@ -16,7 +15,11 @@ The easiest way to install the package into your Python environment is
 to use [pip](https://pip.pypa.io):
 
 1. Download [pip](https://pip.pypa.io) if your Python environment does not have it already.
-2. Run the command: 
+2. Run the commands: 
+    ```
+    pip install csiro_workspace
+    ```
+    or alternatively,
     ```
     pip install git+https://github.com/csiro-workspace/workspace-python.git
     ```

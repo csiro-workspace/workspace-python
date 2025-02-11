@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "csiro-workspace"
+version = "0.2.0"
+authors = [
+  { name="Lachlan Hetherton", email="lachlan.hetherton@csiro.au" },
+]
+description = "Python module for executing CSIRO Workspace workflows embedded within Python applications."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Repository = "https://github.com/csiro-workspace/workspace-python"
+Homepage = "https://research.csiro.au/workspace"
+

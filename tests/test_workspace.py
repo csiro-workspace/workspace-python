@@ -3,7 +3,6 @@ import unittest
 import os.path
 
 class TestWorkspace(unittest.TestCase):
-
     def setUp(self):
         def onConnected(workspace):
             return True
