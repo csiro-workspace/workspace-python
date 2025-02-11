@@ -1,4 +1,4 @@
-import csiro_workspace.workspace as workspace
+import csiro_workspace as ws
 import unittest
 import os.path
 
@@ -8,7 +8,7 @@ class TestWorkspace(unittest.TestCase):
         def onConnected(workspace):
             return True
         self.filePath = os.path.join(os.path.dirname(__file__), 'test_workspace.wsx')
-        self.ws = workspace.Workspace(self.filePath, onConnected)
+        self.ws = ws.Workspace(self.filePath, onConnected)
 
     def tearDown(self):
         self.ws.terminate()
@@ -22,23 +22,47 @@ class TestWorkspace(unittest.TestCase):
             self.called = True
             return 1
         self.watchListOut = None
-        self.ws.watch(callback=watchCallback, watchList=workspace.WatchList.fromIONames(outputs=['Result']), autoDelete=True)
+        self.ws.watch(callback=watchCallback, watchList=ws.WatchList.fromIONames(outputs=['Result']), autoDelete=True)
         self.ws.setInput('Value1', '2')
         self.ws.setInput('Value2', '4')
         self.ws.runOnce()
         while not self.watchListOut:
-            self.ws.poll()
+            ws.Workspace.poll()
         self.assertEqual(len(self.watchListOut.inputs.keys()), 0)
         self.assertEqual(len(self.watchListOut.outputs.keys()), 1)
         self.assertEqual(len(self.watchListOut.globalNames.keys()), 0)
         self.assertEqual(self.watchListOut.outputs['Result']['value'], 8)
+
+    def test_setInput_WrongName(self):
+        exceptionOccurred = False
+        def onErrorCallback(workspace, msg):
+            nonlocal exceptionOccurred 
+            exceptionOccurred = True
+            return True
+        self.ws.onError(onErrorCallback) 
+        self.ws.setInput('ValueX', 5)
+        while (not exceptionOccurred):
+            ws.Workspace.poll()
+        self.assertEqual(exceptionOccurred, True)
+
+    def test_setInput_WrongValue(self):
+        exceptionOccurred = False
+        def onErrorCallback(workspace, msg):
+            nonlocal exceptionOccurred 
+            exceptionOccurred = True
+            return True
+        self.ws.onError(onErrorCallback) 
+        self.ws.setInput('Value1', 'b')
+        while (not exceptionOccurred):
+            ws.Workspace.poll()
+        self.assertEqual(exceptionOccurred, True)
 
     def test_setGlobalName(self):
         def watchCallback(workspace, watchList):
             self.watchListOut = watchList
             return True
         self.watchListOut = None
-        self.ws.watch(callback=watchCallback, watchList=workspace.WatchList.fromIONames(globalNames=['StringOut']), autoDelete=True)
+        self.ws.watch(callback=watchCallback, watchList=ws.WatchList.fromIONames(globalNames=['StringOut']), autoDelete=True)
         self.ws.setGlobalName('StringIn', '_plus_string')
         self.ws.runOnce()
         while not self.watchListOut:
@@ -49,17 +73,17 @@ class TestWorkspace(unittest.TestCase):
         self.assertEqual(self.watchListOut.globalNames['StringOut']['value'], 'Result: 0_plus_string')
 
     def test_cancelWatch(self):
+        self.watchListOut = None
         def watchCallback(workspace, watchList):
             self.watchListOut = watchList
             return True
-        self.watchListOut = None
-        self.watchListIn = workspace.WatchList.fromIONames(outputs=['Result'])
+        self.watchListIn = ws.WatchList.fromIONames(outputs=['Result'])
         self.ws.watch(callback=watchCallback, watchList=self.watchListIn, autoDelete=False)
-        self.ws.setInput('Value1', '2')
-        self.ws.setInput('Value2', '4')
+        self.ws.setInput('Value1', 2)
+        self.ws.setInput('Value2', 4)
         self.ws.runOnce()
         while not self.watchListOut:
-            self.ws.poll()
+            ws.Workspace.poll()
         self.assertEqual(self.watchListOut.id, self.watchListIn.id)
         self.ws.cancelWatch(self.watchListIn.id)
 
@@ -197,25 +221,27 @@ class TestWorkspace(unittest.TestCase):
         self.started = False
         self.expectedResults = [1, 1, 2, 3, 4, 5]
         self.watchCount = 0
-        def watchCallback(ws, watchList):
+        def watchCallback(workspace, watchList):
+            print(self.watchCount)
             self.assertEqual(watchList.outputs['Result']['value'], self.expectedResults[self.watchCount])
             self.watchCount += 1
-            ws.setInput('Value2', self.watchCount)
-            if self.watchCount == len(self.expectedResults):
-                workspace.Workspace.stopEventLoop()
+            if (self.watchCount < len(self.expectedResults)):
+                workspace.setInput('Value2', self.watchCount)
+            elif self.watchCount == len(self.expectedResults):
+                ws.Workspace.stopEventLoop()
             return True
         def eventLoopStarted():
             #try:
             self.started = True
             self.assertTrue(self.started)
-            watchListIn = workspace.WatchList.fromIONames(outputs=['Result'])
+            watchListIn = ws.WatchList.fromIONames(outputs=['Result'])
             self.ws.watch(callback=watchCallback, watchList=watchListIn, autoDelete=False)
             self.ws.setInput('Value1', 1)
             self.ws.setInput('Value2', 1)
             self.ws.runContinuously()
             return True
 
-        workspace.Workspace.startEventLoop(eventLoopStarted)
+        ws.Workspace.startEventLoop(eventLoopStarted)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestWorkspace)
 unittest.TextTestRunner(verbosity=0).run(suite)

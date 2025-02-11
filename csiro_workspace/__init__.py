@@ -21,3 +21,8 @@
 
 __all__ = ['workspace']
 
+# Expose Workspace, WatchList and config as top-level items
+from .workspace import Workspace
+from .workspace import WatchList
+from .workspace import IONotExistsError
+from .config import config

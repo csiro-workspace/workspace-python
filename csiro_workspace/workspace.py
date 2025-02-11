@@ -10,7 +10,9 @@ control which copy of Workspace to use when running workflows, the port on
 which TCP communication to running Workspace processes should occur, and the
 log-level used by each process.
 
-Copyright 2015 by:
+--
+
+Copyright 2025 by:
 
 Commonwealth Scientific and Industrial Research Organisation (CSIRO)
 
@@ -25,118 +27,14 @@ For further information, contact: workspace@csiro.au
 This copyright notice must be included with all copies of the source code.
 """
 
-from ctypes import cdll, byref, c_char, c_char_p, c_int, c_void_p, c_bool, Structure, pointer, POINTER, CFUNCTYPE
-import platform
 import copy
 import subprocess
 import atexit
-import uuid
-import json
 import datetime
-import os.path
-import ctypes
-
-class _WORKSPACE_ID(Structure):
-    """
-    Struct for our WorkspaceId type. Maps to a C struct in the WorkspaceWeb
-    shared library by extending ctypes.Structure.
-    """
-    _fields_ = [("key",  c_int),
-                ("port", c_int),
-                ("host", c_char * 255)]
-
-    # Returns the key in the correct format. We don't want it as a c_int.
-    def getKey(self):
-        return int(self.key)
-
-
-# Load our Workspace config file
-_ws_config_file = open(os.path.dirname(__file__) + '/workspace.cfg', 'r')
-_ws_config = json.load(_ws_config_file)
-
-# Function types for our C++ code to call back into
-LOOPSTARTFUNC = CFUNCTYPE(c_int)
-CONNFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID))
-SUCCESSFUNC   = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID))
-FAILFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID))
-ERRORFUNC     = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
-WATCHFUNC     = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
-LISTFUNC      = CFUNCTYPE(c_int, POINTER(_WORKSPACE_ID), c_char_p)
-
-# Our C++ function references
-LibWorkspaceWeb = None
-if platform.system() == 'Windows':
-    LibWorkspaceWeb = ctypes.WinDLL(_ws_config['workspace_install_dir'] + '/lib/workspaceweb.dll', winmode = 0x8)
-elif platform.system() == 'Linux':
-    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.so')
-else:
-    LibWorkspaceWeb = cdll.LoadLibrary(_ws_config['workspace_install_dir'] + '/lib/libworkspaceweb.dylib')
-server_init                           = LibWorkspaceWeb.server_init
-server_listen_for_connection_and_wait = LibWorkspaceWeb.server_listen_for_connection_and_wait
-server_start_event_loop               = LibWorkspaceWeb.server_start_event_loop
-server_stop_event_loop                = LibWorkspaceWeb.server_stop_event_loop
-workspace_register_func_success       = LibWorkspaceWeb.workspace_register_func_success
-workspace_register_func_failed        = LibWorkspaceWeb.workspace_register_func_failed
-workspace_register_func_error         = LibWorkspaceWeb.workspace_register_func_error
-server_poll                           = LibWorkspaceWeb.server_poll
-workspace_run_once                    = LibWorkspaceWeb.workspace_run_once
-workspace_run_continuously            = LibWorkspaceWeb.workspace_run_continuously
-workspace_terminate                   = LibWorkspaceWeb.workspace_terminate
-workspace_set_input                   = LibWorkspaceWeb.workspace_set_input
-workspace_set_global_name             = LibWorkspaceWeb.workspace_set_global_name
-workspace_list_inputs                 = LibWorkspaceWeb.workspace_list_inputs
-workspace_list_outputs                = LibWorkspaceWeb.workspace_list_outputs
-workspace_list_global_names           = LibWorkspaceWeb.workspace_list_global_names
-workspace_watch                       = LibWorkspaceWeb.workspace_watch
-workspace_cancel_watch                = LibWorkspaceWeb.workspace_cancel_watch
-workspace_stop                        = LibWorkspaceWeb.workspace_stop
-
-def _initCInterface():
-    """
-    Initialises our C++ function references, assigning the correct parameter
-    types and return types.
-    """
-    server_init.restype = c_int
-    server_init.argtypes = [c_int]
-    server_listen_for_connection_and_wait.restype = c_int
-    server_listen_for_connection_and_wait.argtypes = [c_char_p, c_int, CONNFUNC]
-    server_start_event_loop.restype = c_int
-    server_start_event_loop.argtypes = [LOOPSTARTFUNC]
-    server_stop_event_loop.restype = c_int
-    workspace_register_func_success.restype = c_int
-    workspace_register_func_success.argtypes = [POINTER(_WORKSPACE_ID), SUCCESSFUNC]
-    workspace_register_func_failed.restype = c_int
-    workspace_register_func_failed.argtypes = [POINTER(_WORKSPACE_ID), FAILFUNC]
-    workspace_register_func_error.restype = c_int
-    workspace_register_func_error.argtypes = [POINTER(_WORKSPACE_ID), ERRORFUNC]
-    server_poll.restype = c_int
-    server_poll.argtypes = [c_int]
-    workspace_run_once.restype = c_int
-    workspace_run_once.argtypes = [POINTER(_WORKSPACE_ID)]
-    workspace_run_continuously.restype = c_int
-    workspace_run_continuously.argtypes = [POINTER(_WORKSPACE_ID)]
-    workspace_terminate.restype = c_int
-    workspace_terminate.argtypes = [POINTER(_WORKSPACE_ID)]
-    workspace_set_input.restype = c_int
-    workspace_set_input.argtypes = [POINTER(_WORKSPACE_ID), c_char_p, c_char_p]
-    workspace_set_global_name.restype = c_int
-    workspace_set_global_name.argtypes = [POINTER(_WORKSPACE_ID), c_char_p, c_char_p]
-    workspace_list_inputs.restype = c_int
-    workspace_list_inputs.argtypes = [POINTER(_WORKSPACE_ID), LISTFUNC]
-    workspace_list_outputs.restype = c_int
-    workspace_list_outputs.argtypes = [POINTER(_WORKSPACE_ID), LISTFUNC]
-    workspace_list_global_names.restype = c_int
-    workspace_list_global_names.argtypes = [POINTER(_WORKSPACE_ID), LISTFUNC]
-    workspace_watch.restype = c_int
-    workspace_watch.argtypes = [POINTER(_WORKSPACE_ID), c_char_p, WATCHFUNC]
-    workspace_cancel_watch.restype = c_int
-    workspace_cancel_watch.argtypes = [POINTER(_WORKSPACE_ID), c_char_p]
-    workspace_stop.restype = c_int
-    workspace_stop.argtypes = [POINTER(_WORKSPACE_ID)]
-
-    # Initialise the server
-    server_init(_ws_config['log_level'])
-
+import json
+import uuid
+from .config import config
+from . import bindings as bd
 
 class IONotExistsError(Exception):
     """
@@ -216,7 +114,7 @@ class WatchList(object):
         a new watch (i.e. with the `Workspace.watch()` method), the `type` and
         `value` members of each input, output or globalName are not required.
         Also note that the `id` member is crucial, as this is used to globally
-        identify the WatchList. If an `id` parameter is not present in the
+        identify the  If an `id` parameter is not present in the
         string, `None` will be returned.
         """
         wl = json.loads(jsonStr)
@@ -285,7 +183,6 @@ class WatchList(object):
         """
         return self._globalNames
 
-
 class _WatchCallback(object):
     """
     Callback wrapper for watching an input, output or globalname in a
@@ -318,7 +215,6 @@ class _WatchCallback(object):
         if self.autodelete:
             self.workspace._removeWatch(self.watchId)
         return result
-
 
 class Workspace:
     """
@@ -402,7 +298,7 @@ class Workspace:
         *Note:* failure to stop the event loop will cause the application to
         hang on exit.
         """
-        server_start_event_loop(LOOPSTARTFUNC(onStartFunc))
+        bd.server_start_event_loop(bd.LOOPSTARTFUNC(onStartFunc))
         Workspace._event_loop_running = True
 
     @staticmethod
@@ -410,7 +306,7 @@ class Workspace:
         """
         Stops the event loop if it is running.
         """
-        server_stop_event_loop()
+        bd.server_stop_event_loop()
 
     @staticmethod
     def poll(timeoutMs=0):
@@ -423,7 +319,7 @@ class Workspace:
         method should wait until returning in the case that there are no new
         updates available.
         """
-        server_poll(timeoutMs)
+        bd.server_poll(timeoutMs)
 
         # Each time we poll, we iterate over the list of existing terminating
         # procesess and kill them if they've been taking too long to shut down.
@@ -433,7 +329,7 @@ class Workspace:
             ws = procRef[1]
             timeTerminated = procRef[0]
             if None == ws._process.poll():
-                if (datetime.datetime.now() - timeTerminated).seconds > _ws_config['terminate_timeout_sec']:
+                if (datetime.datetime.now() - timeTerminated).seconds > config['terminate_timeout_sec']:
                     ws._process.kill()
                     ws._cleanup()
                     Workspace._terminating_processes.remove(procRef)
@@ -457,13 +353,13 @@ class Workspace:
             # Register success, failed and error callbacks. Make sure to store them
             # in the local workspace, otherwise they'll get garbage collected
             # before being invoked.
-            workspace_register_func_success(workspaceId, self._successCallback)
-            workspace_register_func_failed(workspaceId, self._failedCallback)
-            workspace_register_func_error(workspaceId, self._errorCallback)
+            bd.workspace_register_func_success(workspaceId, self._successCallback)
+            bd.workspace_register_func_failed(workspaceId, self._failedCallback)
+            bd.workspace_register_func_error(workspaceId, self._errorCallback)
 
             # Invoke our callback for when a process has connected successfully
             return onConnected(self)
-        return CONNFUNC(callback)
+        return bd.CONNFUNC(callback)
 
     def _createSuccessCallback(self):
         """
@@ -476,7 +372,7 @@ class Workspace:
                 return self._onSuccessFunc(self)
             except:
                 return True
-        return SUCCESSFUNC(callback)
+        return bd.SUCCESSFUNC(callback)
 
     def _createFailedCallback(self):
         """
@@ -489,7 +385,7 @@ class Workspace:
                 return self._onFailedFunc(self)
             except:
                 return True
-        return FAILFUNC(callback)
+        return bd.FAILFUNC(callback)
 
     def _createErrorCallback(self):
         """
@@ -502,9 +398,9 @@ class Workspace:
                 return self._onErrorFunc(self, errorMessage)
             except:
                 return True
-        return ERRORFUNC(callback)
+        return bd.ERRORFUNC(callback)
 
-    def _create_WatchCallback(self):
+    def _createWatchCallback(self):
         """
         Factory method to create an watch callback function that can
         be invoked by ctypes that still has access to 'self' because it
@@ -514,7 +410,10 @@ class Workspace:
             wl = WatchList.fromJson(watchListStr)
             if wl and wl.id in self._watches.keys():
                 return self._watches[wl.id](wl)
-        return WATCHFUNC(callback)
+            print(f"Attempted to call watch with ID that is not registered: {wl.id}.")
+            return None
+            
+        return bd.WATCHFUNC(callback)
 
     def _createListCallback(self, ioType):
         """
@@ -527,7 +426,7 @@ class Workspace:
             result = self._listRequests[ioType](self, ioList)
             del self._listRequests[ioType]
             return result
-        return LISTFUNC(callback)
+        return bd.LISTFUNC(callback)
 
     def _removeWatch(self, watchId):
         """
@@ -584,7 +483,7 @@ class Workspace:
         self._successCallback = self._createSuccessCallback()
         self._failedCallback = self._createFailedCallback()
         self._errorCallback = self._createErrorCallback()
-        self._watchCallback = self._create_WatchCallback()
+        self._watchCallback = self._createWatchCallback()
         self._listCallbackInputs = self._createListCallback('inputs')
         self._listCallbackOutputs = self._createListCallback('outputs')
         self._listCallbackGlobalNames = self._createListCallback('globalNames')
@@ -592,14 +491,14 @@ class Workspace:
         # Start our actual child process. We start it first since it's
         # asynchronous, whereas our server isn't (since we don't have an event loop)
         self._process = subprocess.Popen([
-            _ws_config['workspace_install_dir'] + '/bin/workspace-web',
+            config['workspace_install_dir'] + '/bin/workspace-web',
             fileName,
-            '--port', '%d' % _ws_config['connection_port'],
-            '--log-level', '%d' % _ws_config['log_level']
+            '--port', '%d' % config['connection_port'],
+            '--log-level', '%d' % config['log_level']
         ])
 
         # Listen to connections from our new process.
-        success = server_listen_for_connection_and_wait(Workspace._SERVER_ADDRESS, _ws_config['connection_port'], self._connectedCallback)
+        success = bd.server_listen_for_connection_and_wait(Workspace._SERVER_ADDRESS, config['connection_port'], self._connectedCallback)
         if not success:
             raise RuntimeError('Failed to connect to Workspace process running "%s"' % fileName)
 
@@ -631,7 +530,7 @@ class Workspace:
         either completes or fails. It is the responsibility of the user to
         re-execute it as required.
         """
-        workspace_run_once(byref(self._id))
+        bd.workspace_run_once(bd.byref(self._id))
 
     def runOnceAndWait(self, timeoutMs=30000):
         """
@@ -672,7 +571,7 @@ class Workspace:
         is updated via the `setInput` or `setGlobalName` methods, the workflow
         will re-execute the affected parts of the workflow.
         """
-        workspace_run_continuously(byref(self._id))
+        bd.workspace_run_continuously(bd.byref(self._id))
 
     def stop(self):
         """
@@ -684,7 +583,7 @@ class Workspace:
 
         __*Note:* This method is asynchronous__
         """
-        workspace_stop(byref(self._id))
+        bd.workspace_stop(bd.byref(self._id))
 
     def terminate(self):
         """
@@ -694,7 +593,7 @@ class Workspace:
             return
 
         # Calling this will tell the process to terminate itself.
-        success = workspace_terminate(byref(self._id))
+        success = bd.workspace_terminate(bd.byref(self._id))
 
         # Before we get rid of the process reference, store it in the queue of
         # terminating processes so that we can get kill it if it doesn't
@@ -715,7 +614,7 @@ class Workspace:
 
         __*Note:* This method is asynchronous__
         """
-        return workspace_set_input(byref(self._id), bytes(inputName, "ascii"), bytes(str(content), "ascii"))
+        return bd.workspace_set_input(bd.byref(self._id), bytes(inputName, "ascii"), bytes(str(content), "ascii"))
 
     def setGlobalName(self, globalName, content):
         """
@@ -731,7 +630,7 @@ class Workspace:
 
         __*Note:* This method is asynchronous__
         """
-        return workspace_set_global_name(byref(self._id), bytes(globalName, "ascii"), bytes(str(content), "ascii"))
+        return bd.workspace_set_global_name(bd.byref(self._id), bytes(globalName, "ascii"), bytes(str(content), "ascii"))
 
     def watch(self, callback, watchList, autoDelete=True):
         """
@@ -745,8 +644,8 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._watches[watchList.id] = _WatchCallback(self, watchList.id, callback, autoDelete)
-        if workspace_watch(byref(self._id), bytes(str(watchList), "ascii"), self._watchCallback, autoDelete):
-            return watchList.id
+        if bd.workspace_watch(bd.byref(self._id), bytes(str(watchList), "ascii"), self._watchCallback, autoDelete):
+            return watchList.id 
         return None
 
     def cancelWatch(self, watchId):
@@ -755,7 +654,7 @@ class Workspace:
         existing callback associated with the `watchId`.
         """
         self._removeWatch(watchId)
-        workspace_cancel_watch(byref(self._id), bytes(str(watchId), "ascii"))
+        bd.workspace_cancel_watch(bd.byref(self._id), bytes(str(watchId), "ascii"))
 
     def listInputs(self, callback):
         """
@@ -765,7 +664,7 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._listRequests['inputs'] = callback
-        return workspace_list_inputs(byref(self._id), self._listCallbackInputs);
+        return bd.workspace_list_inputs(bd.byref(self._id), self._listCallbackInputs);
 
     def listOutputs(self, callback):
         """
@@ -775,7 +674,7 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._listRequests['outputs'] = callback
-        return workspace_list_outputs(byref(self._id), self._listCallbackOutputs);
+        return bd.workspace_list_outputs(bd.byref(self._id), self._listCallbackOutputs);
 
     def listGlobalNames(self, callback):
         """
@@ -785,7 +684,7 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._listRequests['globalNames'] = callback
-        return workspace_list_global_names(byref(self._id), self._listCallbackGlobalNames)
+        return bd.workspace_list_global_names(bd.byref(self._id), self._listCallbackGlobalNames)
 
     def getOutputs(self):
         """
@@ -869,9 +768,6 @@ class Workspace:
         __*Note:* This method is asynchronous__
         """
         self._onErrorFunc = callback
-
-# Prior to using the module, all our c functions need to be initialised.
-_initCInterface()
 
 # Make sure that on quit() or exit() calls, all our subprocesses are shut down.
 atexit.register(Workspace._atexit)
