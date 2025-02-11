@@ -25,4 +25,4 @@ __all__ = ['workspace']
 from .workspace import Workspace
 from .workspace import WatchList
 from .workspace import IONotExistsError
-from .config import config
+from .config import config, save_config

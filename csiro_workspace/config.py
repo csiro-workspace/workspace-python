@@ -19,13 +19,22 @@ This copyright notice must be included with all copies of the source code.
 """
 
 import os
+import platform
 import json
 
 _config_file_path = os.path.dirname(__file__) + '/workspace.cfg'
 
 # Default config dict
+_default_ws_path = '/Path/To/Workspace/Install/Dir'
+if platform.system() == 'Windows':
+    _default_ws_path = 'C:/Program Files/csiro.au/workspace'
+elif platform.system() == 'Linux':
+    _default_ws_path = '/opt/csiro.au/workspace'
+elif platform.system() == 'Darwin':
+    _default_ws_path = '/usr/local/csiro.au/workspace'
+
 _default_config = {
-    "workspace_install_dir": "/Path/To/Workspace/Install/Dir",
+    "workspace_install_dir": _default_ws_path,
     "connection_port": 58660,
     "terminate_timeout_sec": 10,
     "runonce_timeout_sec": 10,
@@ -33,7 +42,7 @@ _default_config = {
 }
 config = _default_config
 
-def saveConfig():
+def save_config():
     """
     Writes the Workspace config to disk, using the values stored in
     the config variable. Allows the caller to modify the config using
@@ -42,18 +51,18 @@ def saveConfig():
     """
     _config_file = open(_config_file_path, 'w')
     _config_file.write(json.dumps(config, sort_keys=True, indent=4))
-
+    _config_file.close()
 
 try:
     # Load our Workspace config file
     _config_file = open(_config_file_path, 'r')
     config = json.load(_config_file)
-
+    _config_file.close()
 except FileNotFoundError as e:
     # File doesn't exist, create it and populate it with a basic structure
     print(f"Configuration file {_config_file_path} does not exist. Creating file with default values.")
     _config_file = open(_config_file_path, 'x')
     _config_file.write(json.dumps(_default_config, sort_keys=True, indent=4))
-
+    _config_file.close()
 except json.decoder.JSONDecodeError as e:
     print(f"Configuration file {_config_file_path} contains invalid JSON. Details follow:\n{e.msg}")

@@ -39,7 +39,21 @@ python3 -m unittest tests/test_workspace.py
 ```
 
 ## Configuration
-The Workspace Python package comes with a JSON configuration file
+To run Workspace workflows, the csiro-workspace Python package needs to
+know where the Workspace installation is. When first importing the
+module, it will have a guess, but depending on your installation, it may
+be incorrect. To fix this, start an interactive Python session and
+update the configuration:
+```
+$ python3
+>>> import csiro_workspace
+Failed to initialize workspace-web shared library - possible the path in the config is incorrect.
+Recommend setting csiro_workspace.config['workspace_install_dir'], then invoking csiro_workspace.save_config()
+>>> csiro_workspace.config['workspace_install_dir'] = '/path/to/workspace'
+>>> csiro_workspace.save_config()
+>>> exit()
+```
+Under the hood, the csiro-workspace Python package is managing a JSON configuration file
 `workspace.cfg` which can be found in your Python installation directory under
 `site-packages/csiro_workspace` and looks vaguely like this:
 ```
@@ -62,8 +76,6 @@ The Workspace Python package comes with a JSON configuration file
    "log_level": 2
 }
 ```
-Depending on where Workspace is installed on the target system, and
-how you want it configured, you will need to edit this file.
 
 ## Generating the API documentation
 For developers that wish to generate updated API documentation, this can

@@ -2,9 +2,14 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "*.cfg",
+]
+
 [project]
 name = "csiro-workspace"
-version = "0.2.2"
+version = "0.2.4"
 authors = [
   { name="Lachlan Hetherton", email="lachlan.hetherton@csiro.au" },
 ]

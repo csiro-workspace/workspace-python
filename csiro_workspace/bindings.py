@@ -141,6 +141,6 @@ try:
 
 except OSError as e:
     print(f"Failed to initialize workspace-web shared library - possible the path in the config is incorrect. Message follows:\n{e}")
-    print(f"Recommend setting csiro_workspace.config.config['workspace_install_dir'], then invoking csiro_workspace.config.saveConfig()")
+    print(f"Recommend setting csiro_workspace.config['workspace_install_dir'], then invoking csiro_workspace.save_config()")
 
 
